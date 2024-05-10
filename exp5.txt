@@ -1,0 +1,136 @@
+__RMIClient.java =class
+
+package RMI_5;
+
+import java.rmi.registry.LocateRegistry;
+import java.rmi.registry.Registry;
+import java.util.Scanner;
+
+public class RMIClient {
+    public static void main(String[] args) {
+        try {
+            // Get a reference to the RMI registry
+            Registry registry = LocateRegistry.getRegistry("localhost", 1099);
+
+            // Look up the remote object from the registry
+            PallindromeChecker palindromeChecker = (PallindromeChecker) registry.lookup("PalindromeService");
+
+            // Create a Scanner object for user input
+            Scanner scanner = new Scanner(System.in);
+
+            // Ask the user for input
+            System.out.print("Enter a string or number to check for palindrome: ");
+            String input = scanner.nextLine();
+
+            // Call the remote method with the user's input
+            boolean isPalindrome = palindromeChecker.isPalindrome(input);
+
+            // Display the result
+            System.out.println(input + " is a palindrome: " + isPalindrome);
+
+            // Close the scanner
+            scanner.close();
+        } catch (Exception e) {
+            System.err.println("Client exception: " + e.toString());
+            e.printStackTrace();
+        }
+    }
+}
+
+__RMIServer.java=class
+
+
+package RMI_5;
+
+import java.rmi.RemoteException;
+import java.rmi.registry.LocateRegistry;
+import java.rmi.registry.Registry;
+import java.rmi.server.UnicastRemoteObject;
+
+public class RMIServer extends UnicastRemoteObject implements PallindromeChecker {
+
+    protected RMIServer() throws RemoteException {
+        super();
+    }
+
+    @Override
+    public boolean isPalindrome(String str) throws RemoteException {
+        // Remove all non-alphanumeric characters and convert to lowercase
+        String cleanStr = str.replaceAll("[^a-zA-Z0-9]", "").toLowerCase();
+
+        // Check if the clean string is a palindrome
+        int left = 0;
+        int right = cleanStr.length() - 1;
+
+        while (left < right) {
+            if (cleanStr.charAt(left) != cleanStr.charAt(right)) {
+                return false;
+            }
+            left++;
+            right--;
+        }
+        return true;
+    }
+
+    public static void main(String[] args) {
+        try {
+            // Create an instance of the RMIServer
+            RMIServer server = new RMIServer();
+
+            // Bind the RMIServer to the RMI registry
+            Registry registry = LocateRegistry.createRegistry(1099);
+
+            // Default RMI registry port
+            registry.rebind("PalindromeService", server);
+            System.out.println("Server started...");
+        } catch (Exception e) {
+            System.err.println("Server exception: " + e.toString());
+            e.printStackTrace();
+        }
+    }
+}
+
+__PallindromeChecke.java = interface
+
+package RMI_5;
+
+import java.rmi.Remote;
+import java.rmi.RemoteException;
+
+public interface PallindromeChecker extends Remote {
+    boolean isPalindrome(String str) throws RemoteException;
+}
+
+
+__PallindromeCheckerImpl.java=class
+
+package RMI_5;
+
+import java.rmi.RemoteException;
+import java.rmi.server.UnicastRemoteObject;
+
+public class PallindromeCheckerImpl extends UnicastRemoteObject implements PallindromeChecker {
+
+    protected PallindromeCheckerImpl() throws RemoteException {
+        super();
+    }
+
+    @Override
+    public boolean isPalindrome(String str) throws RemoteException {
+        // Remove all non-alphanumeric characters and convert to lowercase
+        String cleanStr = str.replaceAll("[^a-zA-Z0-9]", "").toLowerCase();
+
+        // Check if the clean string is a palindrome
+        int left = 0;
+        int right = cleanStr.length() - 1;
+
+        while (left < right) {
+            if (cleanStr.charAt(left) != cleanStr.charAt(right)) {
+                return false;
+            }
+            left++;
+            right--;
+        }
+        return true;
+    }
+}

@@ -1,0 +1,111 @@
+import java.sql.Connection;
+import java.sql.DriverManager;
+import java.sql.PreparedStatement;
+import java.sql.ResultSet;
+import java.sql.SQLException;
+import java.sql.Statement;
+import java.util.Scanner;
+
+import com.mysql.cj.protocol.Resultset;
+
+public class Exp8 {
+	public static void main(String[] args) throws ClassNotFoundException, SQLException {
+		Scanner sc = new Scanner(System.in);
+		
+		Class.forName("com.mysql.cj.jdbc.Driver");
+		Connection con = DriverManager.getConnection("jdbc:mysql://localhost:3306/exp8","root","root@123");
+		//System.out.println("Got Connection");
+		Statement stmt = con.createStatement();
+		PreparedStatement pstmt = null;
+		ResultSet rs;
+		System.out.println("Got Connection");
+		
+		
+		int choice;
+		int roll;
+		String name;
+		String mail;
+		String create;
+		String read;
+		String update;
+		String delete;
+		char ctn;
+		do {
+			System.out.println("SELECT OPTION BELOW :");
+			System.out.println("1.Create \n2.Read \n3.Update \n4.Delete");
+			System.out.println("Enter Your Choice : ");
+			choice = sc.nextInt();
+		switch (choice) {
+		case 1: {
+			System.out.println("Enter Roll Number => ");
+			roll = sc.nextInt();
+			System.out.println("Enter Name => ");
+			name = sc.next();
+			System.out.println("Enter E-Mail => ");
+			mail = sc.next();
+			create = "insert into college values (?,?,?)";
+			pstmt = con.prepareStatement(create);
+			pstmt.setInt(1, roll);
+			pstmt.setString(2, name);
+			pstmt.setString(3, mail);
+			pstmt.execute();
+			System.out.println("Data Inserted Successfully !");
+			break;
+			
+		}
+		
+		case 2: {
+			read = "select * from college";
+			pstmt = con.prepareStatement(read);
+			rs= pstmt.executeQuery(read);
+			System.out.println("Roll   Name   Mail");
+			while(rs.next()) {
+				roll = rs.getInt(1);
+				name = rs.getString(2);
+				mail = rs.getString(3);
+				
+				System.out.println(roll+"   "+name+"   "+mail);
+			}
+			break;
+				
+		}
+		
+		case 3: {
+			update = "update college set name = ? where roll = ? ";
+			pstmt = con.prepareStatement(update);
+			
+			System.out.println("Enter Roll Number :");
+			roll = sc.nextInt();
+			System.out.println("Enter Name to Update : ");
+			name = sc.next();
+			
+			pstmt.setString(1, name);
+			pstmt.setInt(2, roll);
+			pstmt.execute();
+			System.out.println("Data Updated Successfully");
+			break;
+		}
+		
+		case 4: {
+		
+			delete = "delete from college where roll = ?";
+			System.out.println("Enter Roll Number to Delete :");
+			roll = sc.nextInt();
+			pstmt = con.prepareStatement(delete);
+			pstmt.setInt(1, roll);
+			pstmt.execute();
+			System.out.println("Data Deleted Successfully");
+			break;
+		}
+		default :
+			System.out.println("Choice Not Matched");
+		}
+		System.out.println("\n\nDo you want to continue ? (Y/N)");
+		ctn = sc.next().charAt(0);
+		
+		}   while(Character.toUpperCase(ctn)=='Y');
+		con.close();
+		System.out.println("Program Terminated");
+		
+	}
+}

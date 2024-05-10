@@ -1,0 +1,42 @@
+// (input.html)
+
+<!DOCTYPE html>
+<html>
+<head>
+<meta charset="UTF-8">
+<title>Insert title here</title>
+</head>
+<body>
+	<form action="output.jsp">
+	<label>ENTER THE NUMBER</label>
+	<input type="text" name="un">
+	<input type="submit" value="submit">
+	<br>
+	</form>
+
+</body>
+</html>
+
+//output.jsp:
+
+<%@ page language="java" contentType="text/html; charset=UTF-8"
+    pageEncoding="UTF-8"%>
+<!DOCTYPE html>
+<html>
+<head>
+<meta charset="UTF-8">
+<title>Insert title here</title>
+</head>
+<body>
+<h1>WELCOME TO JSP</h1>
+<br>
+<% 
+String n = request.getParameter("un");
+int no = Integer.parseInt(n);
+out.println("NUMBER YOU ENTER IS : " + no);
+out.println("<br><br>");
+out.println("CUBE OF NUMBER IS : " + no*no*no);
+%>
+
+</body>
+</html>

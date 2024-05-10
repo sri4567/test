@@ -1,0 +1,24 @@
+import java.net.*;
+public class Exp6 {
+
+	public static void main(String[] args) throws UnknownHostException {
+		
+		System.out.println("DETAILS OF SYSTEEM USING getLocalHost() method");
+		InetAddress Address = InetAddress.getLocalHost();
+		System.out.println(Address);
+		System.out.println();
+		
+		System.out.println("DETAILS OF SYSTEEM USING getByName() method");
+		Address = InetAddress.getByName("JEEVAN-PC");
+		System.out.println(Address);
+		System.out.println();
+		
+		System.out.println("DETAILS OF 'www.google.com' USING getAllByName() method");
+		InetAddress A[] = InetAddress.getAllByName("www.google.com");
+		for(int i=0;i<A.length;i++)
+			System.out.println(A[i]);
+		System.out.println();
+
+	}
+
+}

@@ -1,0 +1,134 @@
+//login.html:
+
+<!DOCTYPE html>
+<html>
+<head>
+<meta charset="ISO-8859-1">
+<title>Input Page</title>
+</head>
+<body>
+<form action="Login" method="post">
+<h1>Login</h1>
+
+
+<label>Username</label>
+<input type="text" name="username">
+<br><br>
+<label>Password</label>
+<input type="password" name="password">
+<br><br>
+<input type="submit" value="Submit"><br/>
+</form>
+</body>
+</html>
+
+//UserDao file (class):
+import java.sql.*;
+
+
+public class UserDao {
+public ResultSet checkUserData(String str){ 
+	String driver = "com.mysql.cj.jdbc.Driver";
+String url = "jdbc:mysql://localhost:3306/exp7"; 
+String user = "root";
+String pass = "root@123"; 
+ResultSet rs = null;
+
+try{
+Class.forName(driver); 
+Connection con = DriverManager.getConnection(url,user,pass);
+String query = "SELECT * FROM exp7 WHERE username=?";
+PreparedStatement pstmt=con.prepareStatement(query);
+pstmt.setString(1, str); rs=pstmt.executeQuery();
+}catch(Exception e){
+System.out.println(e);
+}
+
+
+return rs;
+ 
+
+}
+}
+
+//servlet (login.java):
+
+import jakarta.servlet.ServletException;
+import jakarta.servlet.annotation.WebServlet;
+import jakarta.servlet.http.HttpServlet;
+import jakarta.servlet.http.HttpServletRequest;
+import jakarta.servlet.http.HttpServletResponse;
+import java.io.IOException;
+import java.sql.SQLException;
+
+import java.sql.ResultSet;
+
+/**
+ * Servlet implementation class Login
+ */
+public class Login extends HttpServlet {
+	private static final long serialVersionUID = 1L;
+       
+    /**
+     * @see HttpServlet#HttpServlet()
+     */
+    public Login() {
+        super();
+        // TODO Auto-generated constructor stub
+    }
+
+	/**
+	 * @see HttpServlet#doGet(HttpServletRequest request, HttpServletResponse response)
+	 */
+	protected void doGet(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {
+		// TODO Auto-generated method stub
+		response.getWriter().append("Served at: ").append(request.getContextPath());
+	}
+
+	/**
+	 * @see HttpServlet#doPost(HttpServletRequest request, HttpServletResponse response)
+	 */
+	protected void doPost(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {
+	    System.out.println("Servlet Called...");
+	    String username = request.getParameter("username");
+	    String password = request.getParameter("password");
+
+	    response.getWriter().print("Client: Username - " + username);
+	    response.getWriter().print("<br><br>");
+
+	    // Assuming JDBCDao is correctly implemented
+	    UserDao ud = new UserDao();
+	    ResultSet rs = ud.checkUserData(username);
+
+	    boolean credentialsMatch = false;
+	    try {
+	        while (rs.next()) {
+	            String storedUsername = rs.getString(1);
+	            String storedPassword = rs.getString(2);
+
+	            System.out.println("Server: Username - " + storedUsername);
+	            System.out.println("Server: Password - " + storedPassword);
+
+	            // Comparing usernames and passwords
+	            if (storedUsername.equals(username) && storedPassword.equals(password)) {
+	                credentialsMatch = true;
+	                System.out.println("Username and Password Matched");
+	                break; // No need to continue once matched
+	            }
+	        }
+
+	        if (credentialsMatch) {
+	        	 	response.getWriter().print("<br><br>");
+		            response.getWriter().print("Username and Password is match");
+//	             Redirect to Welcome.html
+//	            response.sendRedirect("Welcome.html");
+	        } else {
+	            response.getWriter().print("<br><br>");
+	            response.getWriter().print("Username and Password did not match");
+	        }
+	    } catch (SQLException e) {
+	        e.printStackTrace();
+	    }
+	}
+
+}
